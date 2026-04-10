@@ -35,17 +35,29 @@ let isAdmin = false;
 let currentEventTitle = "";
 let currentFiltersInfo = "";
 
-async function start() {
-    firebaseApp = initializeApp(firebaseConfig); 
-    auth = getAuth(firebaseApp); 
-    db = getFirestore(firebaseApp);
+
+    async function start() {
+    if (!firebaseApp) {
+        firebaseApp = initializeApp(firebaseConfig); 
+        auth = getAuth(firebaseApp); 
+        db = getFirestore(firebaseApp);
+    }
     
     onAuthStateChanged(auth, (user) => { 
+        const isLoginPage = window.location.pathname.endsWith('index.html') || 
+                            window.location.pathname === '/' || 
+                            window.location.pathname.endsWith('/');
+
         if (user) { 
-            setupListeners(); 
-        } 
-        else { 
-            window.location.href = 'index.html'; 
+            if (isLoginPage) {
+                window.location.href = 'Penta.html';
+            } else if (typeof setupListeners === "function") {
+                setupListeners(); 
+            }
+        } else { 
+            if (!isLoginPage) {
+                window.location.href = 'index.html'; 
+            }
         }
     });
 }
