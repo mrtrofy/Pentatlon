@@ -81,5 +81,13 @@
     </div>
 
   <script type="module" src="script.js"></script>
+    <script>
+      // Solo el registro del Service Worker, NADA de Firebase aquí
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
+        });
+      }
+    </script>
 </body>
 </html>

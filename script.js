@@ -45,11 +45,11 @@ let currentFiltersInfo = "";
         }
         
         onAuthStateChanged(auth, (user) => {
-            // Quitamos el display none del body inmediatamente
+            // Quitamos el display:none que pusiste en el CSS
             document.body.style.display = 'block';
 
             const path = window.location.pathname;
-            // Detecta si es la raíz o el index
+            // Detecta login en cualquier navegador móvil
             const isLoginPage = path === '/' || path.endsWith('index.html') || path === '';
 
             if (user) { 
@@ -59,13 +59,12 @@ let currentFiltersInfo = "";
                     setupListeners(); 
                 }
             } else { 
-                if (!isLoginPage) {
+                if (!isLoginPage && !path.includes('registro.html')) {
                     window.location.replace('index.html'); 
                 }
             }
         });
     } catch (error) {
-        console.error("Error inicial:", error);
         document.body.style.display = 'block';
     }
 }
