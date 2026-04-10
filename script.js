@@ -37,29 +37,36 @@ let currentFiltersInfo = "";
 
 
     async function start() {
-    if (!firebaseApp) {
-        firebaseApp = initializeApp(firebaseConfig); 
-        auth = getAuth(firebaseApp); 
-        db = getFirestore(firebaseApp);
-    }
-    
-    onAuthStateChanged(auth, (user) => { 
-        const isLoginPage = window.location.pathname.endsWith('index.html') || 
-                            window.location.pathname === '/' || 
-                            window.location.pathname.endsWith('/');
-
-        if (user) { 
-            if (isLoginPage) {
-                window.location.href = 'Penta.html';
-            } else if (typeof setupListeners === "function") {
-                setupListeners(); 
-            }
-        } else { 
-            if (!isLoginPage) {
-                window.location.href = 'index.html'; 
-            }
+    try {
+        if (!firebaseApp) {
+            firebaseApp = initializeApp(firebaseConfig); 
+            auth = getAuth(firebaseApp); 
+            db = getFirestore(firebaseApp);
         }
-    });
+        
+        onAuthStateChanged(auth, (user) => {
+            // Hacemos visible el body pase lo que pase
+            document.body.style.display = 'block';
+
+            const path = window.location.pathname;
+            const isLoginPage = path.endsWith('index.html') || path === '/' || path.endsWith('/');
+
+            if (user) { 
+                if (isLoginPage) {
+                    window.location.href = 'Penta.html';
+                } else if (typeof setupListeners === "function") {
+                    setupListeners(); 
+                }
+            } else { 
+                if (!isLoginPage) {
+                    window.location.href = 'index.html'; 
+                }
+            }
+        });
+    } catch (error) {
+        console.error("Error al iniciar Firebase:", error);
+        document.body.style.display = 'block'; // Mostrar la web incluso si hay error
+    }
 }
 
 start();
