@@ -81,72 +81,7 @@
         </form>
     </div>
 
-   <script type="module">
-    // 1. Configurar persistencia de sesión (Para abrir la app sin login cada vez)
-    setPersistence(auth, browserLocalPersistence);
-
-    // 2. Activar caché de datos para modo offline
-    enableIndexedDbPersistence(db).catch((err) => {
-        console.warn("Caché offline no disponible:", err.code);
-    });
-    
-    const loader = document.getElementById('loadingOverlay');
-    const authSection = document.getElementById('authSection');
-    let currentMode = 'login';
-
-    lucide.createIcons();
-
-    // Cambiar entre Login y Registro
-    window.switchTab = (mode) => {
-        currentMode = mode;
-        document.getElementById('tab-login').classList.toggle('active', mode === 'login');
-        document.getElementById('tab-register').classList.toggle('active', mode === 'register');
-        document.getElementById('submitBtn').innerText = mode === 'login' ? 'Entrar al Sistema' : 'Crear Nueva Cuenta';
-    };
-
-    // Escuchar estado de autenticación para redirección
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            window.location.href = "Penta.html"; 
-        } else {
-            document.body.style.display = "flex";
-            authSection.classList.remove('hidden');
-        }
-    });
-
-    // Login con Google
-    document.getElementById('googleBtn').onclick = async () => {
-        const provider = new GoogleAuthProvider();
-        loader.style.display = 'flex';
-        try { 
-            await signInWithPopup(auth, provider);
-        } catch (e) { 
-            if (e.code !== 'auth/cancelled-popup-request') alert("Error: " + e.message); 
-        } finally { 
-            loader.style.display = 'none'; 
-        }
-    };
-
-    // Formulario Manual (Login/Registro)
-    document.getElementById('authForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        loader.style.display = 'flex';
-        
-        try {
-            if (currentMode === 'login') {
-                await signInWithEmailAndPassword(auth, email, password);
-            } else {
-                await createUserWithEmailAndPassword(auth, email, password);
-            }
-        } catch (error) {
-            alert("Error de autenticación: " + error.message);
-        } finally {
-            loader.style.display = 'none';
-        }
-    };
-</script>
+  <script type="module" src="script.js"></script>
 
 <script>
   if ('serviceWorker' in navigator) {
