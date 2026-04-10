@@ -45,7 +45,7 @@ let currentFiltersInfo = "";
         }
         
         onAuthStateChanged(auth, (user) => {
-            // Hacemos visible el body pase lo que pase
+            // Esto quita la pantalla negra de inmediato
             document.body.style.display = 'block';
 
             const path = window.location.pathname;
@@ -63,9 +63,15 @@ let currentFiltersInfo = "";
                 }
             }
         });
+
+        // Seguro de vida: si en 3 segundos no ha cargado, forzar visibilidad
+        setTimeout(() => {
+            document.body.style.display = 'block';
+        }, 3000);
+
     } catch (error) {
-        console.error("Error al iniciar Firebase:", error);
-        document.body.style.display = 'block'; // Mostrar la web incluso si hay error
+        console.error("Error crítico:", error);
+        document.body.style.display = 'block';
     }
 }
 
