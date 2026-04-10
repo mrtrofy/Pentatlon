@@ -36,7 +36,7 @@ let currentEventTitle = "";
 let currentFiltersInfo = "";
 
 
-    async function start() {
+   async function start() {
     try {
         if (!firebaseApp) {
             firebaseApp = initializeApp(firebaseConfig); 
@@ -45,37 +45,37 @@ let currentFiltersInfo = "";
         }
         
         onAuthStateChanged(auth, (user) => {
-            // Esto quita la pantalla negra de inmediato
+            // Forzar que se vea la página
             document.body.style.display = 'block';
 
-            const path = window.location.pathname;
-            const isLoginPage = path.endsWith('index.html') || path === '/' || path.endsWith('/');
+            const path = window.location.pathname.toLowerCase();
+            // Esta lógica detecta el login en cualquier celular
+            const isAtLogin = path.endsWith('index.html') || path.endsWith('/') || path === '';
 
             if (user) { 
-                if (isLoginPage) {
-                    window.location.href = 'Penta.html';
+                if (isAtLogin) {
+                    // Usamos replace para que no pueda volver atrás al login
+                    window.location.replace('Penta.html');
                 } else if (typeof setupListeners === "function") {
                     setupListeners(); 
                 }
             } else { 
-                if (!isLoginPage) {
-                    window.location.href = 'index.html'; 
+                if (!isAtLogin) {
+                    window.location.replace('index.html'); 
                 }
             }
         });
 
-        // Seguro de vida: si en 3 segundos no ha cargado, forzar visibilidad
         setTimeout(() => {
-            document.body.style.display = 'block';
-        }, 3000);
+            if (document.body.style.display === 'none') {
+                document.body.style.display = 'block';
+            }
+        }, 1500);
 
     } catch (error) {
-        console.error("Error crítico:", error);
         document.body.style.display = 'block';
     }
 }
-
-start();
 
 window.logoutSession = async () => {
     try { 
