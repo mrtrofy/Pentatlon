@@ -1,0 +1,23 @@
+{
+  "name": "Penta Elite",
+  "short_name": "Penta Elite",
+  "description": "Sistema de gestión para Pentatlón Moderno",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "./LOGO-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./LOGO-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
