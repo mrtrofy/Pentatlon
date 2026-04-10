@@ -18,15 +18,14 @@ import {
     signOut 
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-const firebaseConfig = { 
-    apiKey: "AIzaSyAtWCkDlZuv11AueTW6WEPNwAn97Vf-3yQ", 
-    authDomain: "pentatlon-scores.firebaseapp.com", 
-    projectId: "pentatlon-scores", 
-    storageBucket: "pentatlon-scores.firebasestorage.app", 
-    messagingSenderId: "650229123946", 
-    appId: "1:650229123946:web:a3769c31f8ce1a23edb313" 
+const firebaseConfig = {
+  apiKey: "AIzaSyAtWCkDlZuv11AueTW6WEPNwAn97Vf-3yQ",
+  authDomain: "pentatlon-scores.firebaseapp.com",
+  projectId: "pentatlon-scores",
+  storageBucket: "pentatlon-scores.firebasestorage.app",
+  messagingSenderId: "650229123946",
+  appId: "1:650229123946:web:a3769c31f8ce1a23edb313"
 };
-
 const appId = 'penta-tourney-v2';
 let firebaseApp, auth, db;
 let players = []; 
