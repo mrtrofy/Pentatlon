@@ -15,7 +15,11 @@ import {
     getAuth, 
     signInAnonymously, 
     onAuthStateChanged, 
-    signOut 
+    signOut,
+    signInWithEmailAndPassword,    
+    createUserWithEmailAndPassword, 
+    GoogleAuthProvider,            
+    signInWithPopup                
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -45,26 +49,33 @@ let currentFiltersInfo = "";
         }
         
         onAuthStateChanged(auth, (user) => {
-            // Quitamos el display:none que pusiste en el CSS
+            // Hacemos visible el body
             document.body.style.display = 'block';
 
+            // Buscamos el ID correcto: authSection
+            const section = document.getElementById('authSection');
+            if (section) {
+                section.classList.remove('hidden');
+                section.style.display = 'block';
+            }
+
             const path = window.location.pathname;
-            // Detecta login en cualquier navegador móvil
-            const isLoginPage = path === '/' || path.endsWith('index.html') || path === '';
+            const isAtLogin = path === '/' || path.endsWith('index.html') || path === '' || path === '/index.html';
 
             if (user) { 
-                if (isLoginPage) {
+                if (isAtLogin) {
                     window.location.replace('Penta.html');
                 } else if (typeof setupListeners === "function") {
                     setupListeners(); 
                 }
             } else { 
-                if (!isLoginPage && !path.includes('registro.html')) {
+                if (!isAtLogin && !path.includes('registro.html')) {
                     window.location.replace('index.html'); 
                 }
             }
         });
     } catch (error) {
+        console.error("Error en arranque:", error);
         document.body.style.display = 'block';
     }
 }
@@ -1193,3 +1204,50 @@ window.confirmarReinicioTorneo = () => {
         alert("Torneo reiniciado correctamente.");
     }
 };
+
+// Variable para saber si estamos en Login o Registro
+window.currentMode = 'login';
+
+// Función para cambiar entre pestañas (Login/Registro)
+window.switchTab = (mode) => {
+    window.currentMode = mode;
+    const isLogin = mode === 'login';
+    document.getElementById('tab-login').classList.toggle('active', isLogin);
+    document.getElementById('tab-register').classList.toggle('active', !isLogin);
+    document.getElementById('submitBtn').innerText = isLogin ? 'Entrar al Sistema' : 'Crear Cuenta Nueva';
+};
+
+// Lógica del Botón de Google
+const googleBtn = document.getElementById('googleBtn');
+if (googleBtn) {
+    googleBtn.addEventListener('click', async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+            await signInWithPopup(auth, provider);
+        } catch (error) {
+            console.error("Error Google:", error);
+            alert("Error al acceder con Google");
+        }
+    });
+}
+
+// Lógica del Formulario (Login y Registro)
+const authForm = document.getElementById('authForm');
+if (authForm) {
+    authForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        
+        try {
+            if (window.currentMode === 'register') {
+                await createUserWithEmailAndPassword(auth, email, password);
+                alert("Cuenta creada con éxito");
+            } else {
+                await signInWithEmailAndPassword(auth, email, password);
+            }
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+    });
+}
