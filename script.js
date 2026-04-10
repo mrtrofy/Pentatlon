@@ -45,34 +45,27 @@ let currentFiltersInfo = "";
         }
         
         onAuthStateChanged(auth, (user) => {
-            // Forzar que se vea la página
+            // Quitamos el display none del body inmediatamente
             document.body.style.display = 'block';
 
-            const path = window.location.pathname.toLowerCase();
-            // Esta lógica detecta el login en cualquier celular
-            const isAtLogin = path.endsWith('index.html') || path.endsWith('/') || path === '';
+            const path = window.location.pathname;
+            // Detecta si es la raíz o el index
+            const isLoginPage = path === '/' || path.endsWith('index.html') || path === '';
 
             if (user) { 
-                if (isAtLogin) {
-                    // Usamos replace para que no pueda volver atrás al login
+                if (isLoginPage) {
                     window.location.replace('Penta.html');
                 } else if (typeof setupListeners === "function") {
                     setupListeners(); 
                 }
             } else { 
-                if (!isAtLogin) {
+                if (!isLoginPage) {
                     window.location.replace('index.html'); 
                 }
             }
         });
-
-        setTimeout(() => {
-            if (document.body.style.display === 'none') {
-                document.body.style.display = 'block';
-            }
-        }, 1500);
-
     } catch (error) {
+        console.error("Error inicial:", error);
         document.body.style.display = 'block';
     }
 }
