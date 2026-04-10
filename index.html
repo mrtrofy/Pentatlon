@@ -82,35 +82,6 @@
     </div>
 
    <script type="module">
-    // Importaciones necesarias de Firebase con persistencia
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { 
-        getAuth, 
-        signInWithPopup, 
-        GoogleAuthProvider, 
-        onAuthStateChanged, 
-        signInWithEmailAndPassword, 
-        createUserWithEmailAndPassword,
-        setPersistence,
-        browserLocalPersistence 
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    // Importamos Firestore para activar el caché desde el inicio
-    import { getFirestore, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyAtWCkDlZuv11AueTW6WEPNwAn97Vf-3yQ",
-        authDomain: "pentatlon-scores.firebaseapp.com",
-        projectId: "pentatlon-scores",
-        storageBucket: "pentatlon-scores.firebasestorage.app",
-        messagingSenderId: "650229123946",
-        appId: "1:650229123946:web:a3769c31f8ce1a23edb313"
-    };
-
-    // Inicializar Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
     // 1. Configurar persistencia de sesión (Para abrir la app sin login cada vez)
     setPersistence(auth, browserLocalPersistence);
 

@@ -1,61 +1,84 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { 
-        getFirestore, 
-        doc, 
-        setDoc, 
-        onSnapshot, 
-        collection, 
-        deleteDoc, 
-        addDoc,
-        query,
-        where 
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-    
-    import { 
-        getAuth, 
-        signInAnonymously, 
-        onAuthStateChanged, 
-        signOut 
-    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { 
+    getFirestore, 
+    doc, 
+    setDoc, 
+    onSnapshot, 
+    collection, 
+    deleteDoc, 
+    addDoc,
+    query,
+    where 
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyAtWCkDlZuv11AueTW6WEPNwAn97Vf-3yQ", authDomain: "pentatlon-scores.firebaseapp.com", projectId: "pentatlon-scores", storageBucket: "pentatlon-scores.firebasestorage.app", messagingSenderId: "650229123946", appId: "1:650229123946:web:a3769c31f8ce1a23edb313" };
-        const appId = 'penta-tourney-v2';
-        let firebaseApp, auth, db, players = [], events = [], discData = [], isAdmin = false;
-        let currentEventTitle = "";
-        let currentFiltersInfo = "";
-        async function start() {
-            firebaseApp = initializeApp(firebaseConfig); auth = getAuth(firebaseApp); db = getFirestore(firebaseApp);
-            onAuthStateChanged(auth, (user) => { 
-                if (user) { setupListeners(); } 
-                else { window.location.href = 'index.html'; }
-            });
-        }
+import { 
+    getAuth, 
+    signInAnonymously, 
+    onAuthStateChanged, 
+    signOut 
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        window.logoutSession = async () => {
-            try { await signOut(auth); } 
-            catch (error) { window.location.href = 'index.html'; }
-        };
-// 1. Asegurar que los datos existan
-// 1. Inicialización Unificada
-window.selectedAthlete = null;
-if (!window.bracketWinners) {
-    window.bracketWinners = {
-    round32: Array(32).fill(""), // 16 parejas
-    round16: Array(16).fill(""), // 8 parejas
-    round8: Array(8).fill(""),   // 4 parejas
-    semi: Array(4).fill(""),     // 2 parejas
-    campeon: null                // 1 ganador
+const firebaseConfig = { 
+    apiKey: "AIzaSyAtWCkDlZuv11AueTW6WEPNwAn97Vf-3yQ", 
+    authDomain: "pentatlon-scores.firebaseapp.com", 
+    projectId: "pentatlon-scores", 
+    storageBucket: "pentatlon-scores.firebasestorage.app", 
+    messagingSenderId: "650229123946", 
+    appId: "1:650229123946:web:a3769c31f8ce1a23edb313" 
 };
+
+const appId = 'penta-tourney-v2';
+let firebaseApp, auth, db;
+let players = []; 
+let events = []; 
+let discData = []; 
+let isAdmin = false;
+let currentEventTitle = "";
+let currentFiltersInfo = "";
+
+async function start() {
+    firebaseApp = initializeApp(firebaseConfig); 
+    auth = getAuth(firebaseApp); 
+    db = getFirestore(firebaseApp);
+    
+    onAuthStateChanged(auth, (user) => { 
+        if (user) { 
+            setupListeners(); 
+        } 
+        else { 
+            window.location.href = 'index.html'; 
+        }
+    });
 }
 
-// 2. Función principal corregida
+start();
+
+window.logoutSession = async () => {
+    try { 
+        await signOut(auth); 
+    } catch (error) { 
+        window.location.href = 'index.html'; 
+    }
+};
+
+window.selectedAthlete = null;
+
+if (!window.bracketWinners) {
+    window.bracketWinners = {
+        round32: Array(32).fill(""),
+        round16: Array(16).fill(""),
+        round8: Array(8).fill(""),
+        semi: Array(4).fill(""),
+        campeon: null
+    };
+}
+
 window.openAdvanceManager = () => {
     const modal = document.getElementById('advanceManagerModal');
     const containerIzquierdo = document.getElementById('advanceAtletasList');
     
     if (!modal) return;
 
-    // Llenar la izquierda (Atletas)
     if (containerIzquierdo && window.players) {
         containerIzquierdo.innerHTML = window.players.map(p => `
             <div class="flex justify-between items-center bg-slate-800 p-2 rounded mb-2 border border-slate-700">
@@ -68,10 +91,8 @@ window.openAdvanceManager = () => {
         `).join('');
     }
 
-    // MOSTRAR EL MODAL PRIMERO
     modal.classList.remove('hidden');
 
-    // FORZAR EL DIBUJO DE LAS RONDAS (DERECHA)
     setTimeout(() => {
         window.dibujarRondas();
     }, 50); 
