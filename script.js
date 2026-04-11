@@ -553,6 +553,14 @@ window.updateBracketControls = () => {
             return parseFloat(clean) || 0;
         }
 
+        const UipmPoints = {
+    1: 250, 2: 244, 3: 238, 4: 236, 5: 230, 6: 228, 7: 226, 8: 224, 9: 218, 10: 216,
+    11: 214, 12: 212, 13: 210, 14: 208, 15: 206, 16: 204, 17: 198, 18: 196,
+    19: 194, 20: 192, 21: 190, 22: 188, 23: 186, 24: 184, 25: 182, 26: 180, 27: 178, 
+    28: 176, 29: 174, 30: 172, 31: 170, 32: 168, 33: 166, 34: 164, 35: 162, 36: 160, 
+    37: 158, 38: 156, 39: 154, 40: 152
+};
+
   function renderResults(eventName, sex, phase, category, discipline, group) {
     try {
         const filteredPlayers = players.filter(p => 
@@ -569,38 +577,34 @@ window.updateBracketControls = () => {
         obstaculos: p.obstaculos
     });
 
-    // --- LÓGICA FORZADA A NÚMERO ---
-    // Usamos Number() para asegurar que sean números y no strings
-   const wins = parseInt(p.esgrimaV) || 0;
-const losses = parseInt(p.esgrimaD) || 0;
-const esgrimaPts = (wins === 0 && losses === 0) ? 0 : (196 - ((wins - 17) * 2));
+   const posicion = index + 1;
+const esgrimaPts = UipmPoints[posicion] || Math.max(0, 152 - ((posicion - 40) * 2));
 
+const tObs = parseTime(p.obstaculos);
+const obsPts = tObs > 0 ? Math.max(0, 400 - Math.floor((tObs - 15) / 0.33)) : 0;
 
-    const tObs = parseTime(p.obstaculos);
-    const obsPts = tObs > 0 ? Math.max(0, 400 - Math.floor((tObs - 15) / 0.33)) : 0;
+const tNat = parseTime(p.natacion);
+const natPts = tNat > 0 
+    ? (p.category === "U19" ? Math.max(0, 250 - (tNat - 45) * 2) : Math.max(0, 375 - Math.ceil((tNat - 45) / 0.2)))
+    : 0;
+
+const tLas = parseTime(p.laser);
+let lasPts = 0;
+if (tLas > 0) {
+    lasPts = (p.category === "U19") 
+        ? Math.max(0, 700 - (tLas - 260)) 
+        : Math.max(0, 700 - Math.floor(tLas - 600));
+}
+
+const hPts = esgrimaPts + obsPts + natPts;
+const total = Math.round(hPts + lasPts);
+
+const resultado = { ...p, esgrimaPts, obsPts, natPts, lasPts, hPts, total };
+return resultado;
     
-    const tNat = parseTime(p.natacion);
-    const natPts = tNat > 0 
-        ? (p.category === "U19" ? Math.max(0, 250 - (tNat - 45) * 2) : Math.max(0, 375 - Math.ceil((tNat - 45) / 0.2)))
-        : 0;
-
-    const tLas = parseTime(p.laser);
-    let lasPts = 0;
-    if (tLas > 0) {
-        lasPts = (p.category === "U19") 
-            ? Math.max(0, 700 - (tLas - 260)) 
-            : Math.max(0, 700 - Math.floor(tLas - 600));
-    }
-
-    const hPts = esgrimaPts + obsPts + natPts;
-    const total = Math.round(hPts + lasPts);
-    
-    // Verificamos qué se está retornando
-    const resultado = { ...p, esgrimaPts, obsPts, natPts, lasPts, hPts, total };
-    console.log("Resultado calculado para:", p.name, resultado);
-    
-    return resultado;
 }).sort((a, b) => b.total - a.total);
+
+
         // --- RENDERIZADO DE TABLA PRINCIPAL ---
         const scoreboardBody = document.getElementById('scoreboardBody');
         if (scoreboardBody) {
