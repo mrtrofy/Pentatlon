@@ -571,9 +571,10 @@ window.updateBracketControls = () => {
 
     // --- LÓGICA FORZADA A NÚMERO ---
     // Usamos Number() para asegurar que sean números y no strings
-    const wins = Number(p.wins) || 0;
-    const losses = Number(p.losses) || 0;
-    const esgrimaPts = (wins === 0 && losses === 0) ? 0 : (196 - ((wins - 17) * 2));
+   const wins = parseInt(p.esgrimaV) || 0;
+const losses = parseInt(p.esgrimaD) || 0;
+const esgrimaPts = (wins === 0 && losses === 0) ? 0 : (196 - ((wins - 17) * 2));
+
 
     const tObs = parseTime(p.obstaculos);
     const obsPts = tObs > 0 ? Math.max(0, 400 - Math.floor((tObs - 15) / 0.33)) : 0;
