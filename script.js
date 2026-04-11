@@ -553,51 +553,49 @@ window.updateBracketControls = () => {
             return parseFloat(clean) || 0;
         }
 
-   function renderResults(eventName, sex, phase, category, discipline, group) {
+  function renderResults(eventName, sex, phase, category, discipline, group) {
     try {
-        const pointsTable = [250, 244, 238, 236, 230, 228, 226, 224, 218, 216, 214, 212, 210, 208, 206, 204, 198, 196];
-        
         const filteredPlayers = players.filter(p => 
             p.event === eventName && p.sex === sex && p.phase === phase && 
             p.category === category && p.group === group
         );
 
-     const data = filteredPlayers.sort((a, b) => (parseInt(b.esgrimaV) || 0) - (parseInt(a.esgrimaV) || 0)).map((p, index) => {
-  
-        const wins = p.wins || 0;
-        const losses = p.losses || 0;
-// Usamos wins para el cálculo, no el index
-        const esgrimaPts = (wins === 0 && losses === 0) 
-    ? 0 
-    : (196 - ((wins - 17) * 2));
+        const data = filteredPlayers.map((p) => {
+            // --- LÓGICA ESGRIMA ---
+            const wins = parseInt(p.wins) || 0;
+            const losses = parseInt(p.losses) || 0;
+            const esgrimaPts = (wins === 0 && losses === 0) ? 0 : (196 - ((wins - 17) * 2));
 
-    
-    const tObs = parseTime(p.obstaculos);
-    const obsPts = tObs > 0 ? Math.max(0, 400 - Math.floor((tObs - 15) / 0.33)) : 0;
-    
-    const tNat = parseTime(p.natacion);
-    const natPts = tNat > 0 
-        ? (p.category === "U19" 
-            ? Math.max(0, 250 - (tNat - 45) * 2) 
-            : Math.max(0, 375 - Math.ceil((tNat - 45) / 0.2)))
-        : 0;
+            // --- LÓGICA OBSTÁCULOS ---
+            const tObs = parseTime(p.obstaculos);
+            const obsPts = tObs > 0 ? Math.max(0, 400 - Math.floor((tObs - 15) / 0.33)) : 0;
+            
+            // --- LÓGICA NATACIÓN ---
+            const tNat = parseTime(p.natacion);
+            const natPts = tNat > 0 
+                ? (p.category === "U19" 
+                    ? Math.max(0, 250 - (tNat - 45) * 2) 
+                    : Math.max(0, 375 - Math.ceil((tNat - 45) / 0.2)))
+                : 0;
 
-    const tLas = parseTime(p.laser);
-    let lasPts = 0;
-    if (tLas > 0) {
-        if (p.category === "U19") {
-            lasPts = Math.max(0, 700 - (tLas - 260));
-        } else {
-            lasPts = Math.max(0, 700 - Math.floor(tLas - 600));
-        }
-    }
+            // --- LÓGICA LASER RUN ---
+            const tLas = parseTime(p.laser);
+            let lasPts = 0;
+            if (tLas > 0) {
+                if (p.category === "U19") {
+                    lasPts = Math.max(0, 700 - (tLas - 260));
+                } else {
+                    lasPts = Math.max(0, 700 - Math.floor(tLas - 600));
+                }
+            }
 
-    const hPts = esgrimaPts + obsPts + natPts;
-    
-    return { ...p, esgrimaPts, obsPts, natPts, lasPts, hPts, total: Math.round(hPts + lasPts) };
-}).sort((a, b) => b.total - a.total);
+            const hPts = esgrimaPts + obsPts + natPts;
+            const total = Math.round(hPts + lasPts);
+            
+            return { ...p, esgrimaPts, obsPts, natPts, lasPts, hPts, total };
+        }).sort((a, b) => b.total - a.total);
 
-        // --- TABLA PRINCIPAL: Ahora incluye el ESTADO ---
+        // --- RENDERIZADO DE TABLA PRINCIPAL ---
         const scoreboardBody = document.getElementById('scoreboardBody');
         if (scoreboardBody) {
             scoreboardBody.innerHTML = data.map(p => `
