@@ -22,6 +22,15 @@ import {
     signInWithPopup                
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
+// Tabla oficial de puntos UIPM basada en tu imagen
+const UipmPoints = {
+    1: 250, 2: 244, 3: 238, 4: 236, 5: 230, 6: 228, 7: 226, 8: 224, 9: 218, 10: 216,
+    11: 214, 12: 212, 13: 210, 14: 208, 15: 206, 16: 204, 17: 198, 18: 196,
+    19: 194, 20: 192, 21: 190, 22: 188, 23: 186, 24: 184, 25: 182, 26: 180, 
+    27: 178, 28: 176, 29: 174, 30: 172, 31: 170, 32: 168, 33: 166, 34: 164, 
+    35: 162, 36: 160, 37: 158, 38: 156, 39: 154, 40: 152
+};
+
 const firebaseConfig = {
   apiKey: "AIzaSyAtWCkDlZuv11AueTW6WEPNwAn97Vf-3yQ",
   authDomain: "pentatlon-scores.firebaseapp.com",
@@ -556,45 +565,55 @@ window.updateBracketControls = () => {
 
   function renderResults(eventName, sex, phase, category, discipline, group) {
     try {
-const filteredPlayers = players.filter(p => 
-    p.event === eventName && p.sex === sex && p.phase === phase && 
-    p.category === category && p.group === group
-);
+// 1. Filtrado de atletas (se mantiene igual)
+        const filteredPlayers = players.filter(p => 
+            p.event === eventName && p.sex === sex && p.phase === phase && 
+            p.category === category && p.group === group
+        );
 
-const playersSortedByFencing = [...filteredPlayers].sort((a, b) => {
-    return (parseInt(b.esgrimaV) || 0) - (parseInt(a.esgrimaV) || 0);
-});
+        console.log("Atletas para renderizar:", filteredPlayers.length);
 
-const data = playersSortedByFencing.map((p, index) => {
-    
+        // 2. NUEVA LÓGICA: Sorteo previo por victorias de esgrima (para ranking)
+        // Esto pone al que más ganó en la posición 1
+        const sortedByFencing = [...filteredPlayers].sort((a, b) => {
+            return (parseInt(b.esgrimaV) || 0) - (parseInt(a.esgrimaV) || 0);
+        });
 
-    const hasData = (parseInt(p.esgrimaV) || 0) > 0 || (parseInt(p.esgrimaD) || 0) > 0;
-    
-    const esgrimaPts = hasData ? Math.max(0, 250 - (index * 6)) : 0;
+        // 3. Procesar cálculos usando el ranking fijo
+        const data = sortedByFencing.map((p, index) => {
+            
+            // --- NUEVA LÓGICA ESGRIMA (Tabla Fija de Imagen) ---
+            const posicion = index + 1; // index 0 es posición 1
+            const wins = parseInt(p.esgrimaV) || 0;
+            
+            let esgrimaPts = 0;
+            if (wins > 0) {
+         
+                esgrimaPts = UipmPoints[posicion] || Math.max(0, 152 - ((posicion - 40) * 2));
+            }
 
-    // --- EL RESTO DE TUS CÁLCULOS (Se mantienen igual) ---
-    const tObs = parseTime(p.obstaculos);
-    const obsPts = tObs > 0 ? Math.max(0, 400 - Math.floor((tObs - 15) / 0.33)) : 0;
+            // --- EL RESTO DE TUS CÁLCULOS (Se mantienen igual) ---
+            const tObs = parseTime(p.obstaculos);
+            const obsPts = tObs > 0 ? Math.max(0, 400 - Math.floor((tObs - 15) / 0.33)) : 0;
 
-    const tNat = parseTime(p.natacion);
-    const natPts = tNat > 0 
-        ? (p.category === "U19" ? Math.max(0, 250 - (tNat - 45) * 2) : Math.max(0, 375 - Math.ceil((tNat - 45) / 0.2)))
-        : 0;
+            const tNat = parseTime(p.natacion);
+            const natPts = tNat > 0 
+                ? (p.category === "U19" ? Math.max(0, 250 - (tNat - 45) * 2) : Math.max(0, 375 - Math.ceil((tNat - 45) / 0.2)))
+                : 0;
 
-    const tLas = parseTime(p.laser);
-    let lasPts = 0;
-    if (tLas > 0) {
-        lasPts = (p.category === "U19") 
-            ? Math.max(0, 700 - (tLas - 260)) 
-            : Math.max(0, 700 - Math.floor(tLas - 600));
-    }
+            const tLas = parseTime(p.laser);
+            let lasPts = 0;
+            if (tLas > 0) {
+                lasPts = (p.category === "U19") 
+                    ? Math.max(0, 700 - (tLas - 260)) 
+                    : Math.max(0, 700 - Math.floor(tLas - 600));
+            }
 
-    const hPts = esgrimaPts + obsPts + natPts;
-    const total = Math.round(hPts + lasPts);
+            const hPts = esgrimaPts + obsPts + natPts;
+            const total = Math.round(hPts + lasPts);
 
-    return { ...p, esgrimaPts, obsPts, natPts, lasPts, hPts, total };
-
-}).sort((a, b) => b.total - a.total); // Al final ordenamos la tabla general por el TOTAL
+            return { ...p, esgrimaPts, obsPts, natPts, lasPts, hPts, total };
+        }).sort((a, b) => b.total - a.total); // Finalmente ordenamos la tabla general por TOTAL
 
 
         // --- RENDERIZADO DE TABLA PRINCIPAL ---
