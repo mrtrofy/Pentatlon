@@ -556,43 +556,45 @@ window.updateBracketControls = () => {
 
   function renderResults(eventName, sex, phase, category, discipline, group) {
     try {
-        // 1. Filtrar atletas
-        const filteredPlayers = players.filter(p => 
-            p.event === eventName && p.sex === sex && p.phase === phase && 
-            p.category === category && p.group === group
-        );
+const filteredPlayers = players.filter(p => 
+    p.event === eventName && p.sex === sex && p.phase === phase && 
+    p.category === category && p.group === group
+);
 
-        console.log("Atletas para renderizar:", filteredPlayers.length);
+const playersSortedByFencing = [...filteredPlayers].sort((a, b) => {
+    return (parseInt(b.esgrimaV) || 0) - (parseInt(a.esgrimaV) || 0);
+});
 
-        // 2. Procesar cálculos (con el index corregido)
-        const data = filteredPlayers.map((p, index) => {
-            const wins = parseInt(p.esgrimaV) || 0;
-            const losses = parseInt(p.esgrimaD) || 0;
-            
-            // Tu fórmula de esgrima
-            const esgrimaPts = (wins === 0 && losses === 0) ? 0 : (196 - ((wins - 17) * 6));
+const data = playersSortedByFencing.map((p, index) => {
+    
 
-            const tObs = parseTime(p.obstaculos);
-            const obsPts = tObs > 0 ? Math.max(0, 400 - Math.floor((tObs - 15) / 0.33)) : 0;
+    const hasData = (parseInt(p.esgrimaV) || 0) > 0 || (parseInt(p.esgrimaD) || 0) > 0;
+    
+    const esgrimaPts = hasData ? Math.max(0, 250 - (index * 6)) : 0;
 
-            const tNat = parseTime(p.natacion);
-            const natPts = tNat > 0 
-                ? (p.category === "U19" ? Math.max(0, 250 - (tNat - 45) * 2) : Math.max(0, 375 - Math.ceil((tNat - 45) / 0.2)))
-                : 0;
+    // --- EL RESTO DE TUS CÁLCULOS (Se mantienen igual) ---
+    const tObs = parseTime(p.obstaculos);
+    const obsPts = tObs > 0 ? Math.max(0, 400 - Math.floor((tObs - 15) / 0.33)) : 0;
 
-            const tLas = parseTime(p.laser);
-            let lasPts = 0;
-            if (tLas > 0) {
-                lasPts = (p.category === "U19") 
-                    ? Math.max(0, 700 - (tLas - 260)) 
-                    : Math.max(0, 700 - Math.floor(tLas - 600));
-            }
+    const tNat = parseTime(p.natacion);
+    const natPts = tNat > 0 
+        ? (p.category === "U19" ? Math.max(0, 250 - (tNat - 45) * 2) : Math.max(0, 375 - Math.ceil((tNat - 45) / 0.2)))
+        : 0;
 
-            const hPts = esgrimaPts + obsPts + natPts;
-            const total = Math.round(hPts + lasPts);
+    const tLas = parseTime(p.laser);
+    let lasPts = 0;
+    if (tLas > 0) {
+        lasPts = (p.category === "U19") 
+            ? Math.max(0, 700 - (tLas - 260)) 
+            : Math.max(0, 700 - Math.floor(tLas - 600));
+    }
 
-            return { ...p, esgrimaPts, obsPts, natPts, lasPts, hPts, total };
-        }).sort((a, b) => b.total - a.total);
+    const hPts = esgrimaPts + obsPts + natPts;
+    const total = Math.round(hPts + lasPts);
+
+    return { ...p, esgrimaPts, obsPts, natPts, lasPts, hPts, total };
+
+}).sort((a, b) => b.total - a.total); // Al final ordenamos la tabla general por el TOTAL
 
 
         // --- RENDERIZADO DE TABLA PRINCIPAL ---
