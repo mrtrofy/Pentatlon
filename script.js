@@ -563,7 +563,11 @@ window.updateBracketControls = () => {
         );
 
        const data = filteredPlayers.sort((a, b) => (parseInt(b.esgrimaV) || 0) - (parseInt(a.esgrimaV) || 0)).map((p, index) => {
-    const esgrimaPts = pointsTable[index] !== undefined ? pointsTable[index] : (196 - ((index - 17) * 2));
+   const victorias = p.wins || 0;
+const derrotas = p.losses || 0;
+const esgrimaPts = (victorias === 0 && derrotas === 0) 
+    ? 0 
+    : (pointsTable[index] !== undefined ? pointsTable[index] : (196 - ((index - 17) * 2)));
     const tObs = parseTime(p.obstaculos);
     const obsPts = tObs > 0 ? Math.max(0, 400 - Math.floor((tObs - 15) / 0.33)) : 0;
     
