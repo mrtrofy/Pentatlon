@@ -1282,3 +1282,33 @@ if (authForm) {
         }
     });
 }
+
+window.parseTime = parseTime;
+window.calculateRowTime = (input) => {
+    // 1. Buscamos la fila actual
+    const row = input.closest('tr');
+    
+    // 2. Buscamos los campos (probamos ambos nombres de clase por si acaso)
+    const tInicialInput = row.querySelector('.tiempo-inicial') || row.querySelector('.row-t-inicial');
+    const penalidadInput = row.querySelector('.penalidad-pts') || row.querySelector('.row-penalidad');
+    const tFinalInput = row.querySelector('.tiempo-final') || row.querySelector('.row-t-final');
+
+    if (!tInicialInput || !penalidadInput || !tFinalInput) return;
+
+    // 3. Calculamos usando la función que ya hicimos global
+    let totalSeconds = window.parseTime(tInicialInput.value);
+
+    if (totalSeconds > 0) {
+        const penalidadPts = parseInt(penalidadInput.value) || 0;
+        
+        // Sumamos 25 segundos por cada punto de penalidad
+        totalSeconds += (penalidadPts * 25);
+
+        // 4. Convertimos a MM:SS y lo ponemos en el campo azul
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = Math.floor(totalSeconds % 60);
+        tFinalInput.value = `${mins}:${secs.toString().padStart(2, '0')}`;
+    } else {
+        tFinalInput.value = "";
+    }
+};
