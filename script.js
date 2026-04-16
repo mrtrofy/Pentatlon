@@ -342,14 +342,6 @@ function loadAtletasToSelector() {
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'disciplinas'), (snap) => {
                 discData = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 renderDisciplinas();
-
-                const inputTInicial = document.getElementById('discTiempoInicial');
-const inputPenalidad = document.getElementById('discPenalidad');
-
-if (inputTInicial && inputPenalidad) {
-    inputTInicial.addEventListener('input', window.autoCalculateDiscFinalTime);
-    inputPenalidad.addEventListener('input', window.autoCalculateDiscFinalTime);
-}
             });
         }
 
@@ -701,25 +693,7 @@ if (tournamentBrackets) {
     }
 
 
-    window.autoCalculateDiscFinalTime = () => {
-    const tInicialRaw = document.getElementById('discTiempoInicial').value;
-    const penalidadPts = parseInt(document.getElementById('discPenalidad').value) || 0;
-    const outputField = document.getElementById('discTiempoFinal');
-
-    if (!tInicialRaw) return;
-
-    // 1. Convertir tiempo inicial a segundos totales
-    let totalSeconds = parseTime(tInicialRaw);
-
-    // 2. Sumar 25 segundos por cada punto de penalidad
-    totalSeconds += (penalidadPts * 25);
-
-    // 3. Convertir de vuelta a formato MM:SS
-    const mins = Math.floor(totalSeconds / 60);
-    const secs = Math.floor(totalSeconds % 60);
     
-    outputField.value = `${mins}:${secs.toString().padStart(2, '0')}`;
-};
 
 
     window.tournamentRounds.forEach((roundPlayers, roundIndex) => {
