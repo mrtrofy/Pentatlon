@@ -1220,7 +1220,7 @@ window.closeAdvanceManager = () => {
     document.getElementById('advanceManagerModal').classList.add('hidden');
 };
 
-// --- 3. LIMPIAR LLAVES (REINICIAR TORNEO) ---
+
 window.confirmarReinicioTorneo = () => {
     if (confirm("⚠️ ¿ESTÁS SEGURO? Esto borrará el progreso visual de las llaves y reiniciará el torneo.")) {
         // Reiniciamos las variables globales de las llaves
@@ -1283,32 +1283,33 @@ if (authForm) {
     });
 }
 
-window.parseTime = parseTime;
-window.calculateRowTime = (input) => {
-    // 1. Buscamos la fila actual
-    const row = input.closest('tr');
-    
-    // 2. Buscamos los campos (probamos ambos nombres de clase por si acaso)
-    const tInicialInput = row.querySelector('.tiempo-inicial') || row.querySelector('.row-t-inicial');
-    const penalidadInput = row.querySelector('.penalidad-pts') || row.querySelector('.row-penalidad');
-    const tFinalInput = row.querySelector('.tiempo-final') || row.querySelector('.row-t-final');
+window.parseTime = (val) => {
+    if (!val) return 0;
+    let clean = val.toString().trim().replace(',', '.');
+    if (clean.includes(':')) {
+        const parts = clean.split(':');
+        return (parseFloat(parts[0]) || 0) * 60 + (parseFloat(parts[1]) || 0);
+    }
+    return parseFloat(clean) || 0;
+};
 
-    if (!tInicialInput || !penalidadInput || !tFinalInput) return;
+// 2. Tu función para el formulario naranja
+window.autoCalculateFinalTime = () => {
+    const tIniRaw = document.getElementById('discTiempoInicial').value;
+    const penPts = parseInt(document.getElementById('discPenalidad').value) || 0;
+    const campoFinal = document.getElementById('discTiempoFinal');
 
-    // 3. Calculamos usando la función que ya hicimos global
-    let totalSeconds = window.parseTime(tInicialInput.value);
+    if (!campoFinal) return;
+
+    // IMPORTANTE: Usamos window.parseTime para que no de error
+    let totalSeconds = window.parseTime(tIniRaw);
 
     if (totalSeconds > 0) {
-        const penalidadPts = parseInt(penalidadInput.value) || 0;
-        
-        // Sumamos 25 segundos por cada punto de penalidad
-        totalSeconds += (penalidadPts * 25);
-
-        // 4. Convertimos a MM:SS y lo ponemos en el campo azul
+        totalSeconds += (penPts * 25);
         const mins = Math.floor(totalSeconds / 60);
         const secs = Math.floor(totalSeconds % 60);
-        tFinalInput.value = `${mins}:${secs.toString().padStart(2, '0')}`;
+        campoFinal.value = `${mins}:${secs.toString().padStart(2, '0')}`;
     } else {
-        tFinalInput.value = "";
+        campoFinal.value = "";
     }
 };

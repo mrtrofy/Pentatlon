@@ -102,9 +102,7 @@
                 <div class="card p-6 rounded-3xl border-orange-500/30">
                     <h2 class="text-orange-400 font-black uppercase mb-4 text-sm">Configuración de Pruebas</h2>
                     <div class="space-y-4">
-    <!-- Primera Fila: Selección de Atleta y Datos de Clasificación -->
-    
-    <!-- Agrega esto dentro del div de Configuración de Pruebas -->
+
 <div class="mb-4">
     <label class="text-[9px] uppercase font-black text-slate-500 ml-1">Evento de la Prueba</label>
     <select id="adminEventSelect" class="input-dark w-full p-3 rounded-xl mt-1 text-xs border-blue-500/50">
@@ -188,8 +186,8 @@
             <option value="OCR 400">OCR 400</option>
             <option value="OCR 3 Km+">OCR 3 Km+</option>
         </select>
-        <input type="text" id="discTiempoInicial" placeholder="Tiempo Inicial (m:s.ms)" class="input-dark p-3 rounded-xl text-xs bg-slate-950">
-        <select id="discPenalidad" class="input-dark p-3 rounded-xl text-xs bg-slate-950" onchange="autoCalculateFinalTime()">
+<input type="text" id="discTiempoInicial" oninput="window.autoCalculateFinalTime()" placeholder="Tiempo Inicial (m:s.ms)" class="input-dark p-3 rounded-xl text-xs bg-slate-950">       
+ <select id="discPenalidad" class="input-dark p-3 rounded-xl text-xs bg-slate-950" onchange="autoCalculateFinalTime()">
             <option value="0">0 Pts (0:00)</option>
             <option value="1">1 Pt (0:25)</option>
             <option value="2">2 Pts (0:50)</option>
