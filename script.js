@@ -1310,14 +1310,13 @@ window.autoCalculateFinalTime = () => {
     }
 };
 
-// Filtro de búsqueda en tiempo real
 window.filterAtletasList = () => {
     const searchTerm = document.getElementById('atletaSearchInput').value.toLowerCase();
     const items = document.getElementsByClassName('atleta-item');
 
     Array.from(items).forEach(item => {
         const text = item.innerText.toLowerCase();
-        // Usamos flex para mostrarlo porque es el estilo original de tu diseño
+        // Muestra si coincide, oculta si no
         item.style.display = text.includes(searchTerm) ? "flex" : "none";
     });
 };
