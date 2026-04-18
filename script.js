@@ -1311,12 +1311,17 @@ window.autoCalculateFinalTime = () => {
 };
 
 window.filterAtletasList = () => {
-    const searchTerm = document.getElementById('atletaSearchInput').value.toLowerCase();
+    const input = document.getElementById('atletaSearchInput');
+    const filter = input ? input.value.toLowerCase() : "";
     const items = document.getElementsByClassName('atleta-item');
 
     Array.from(items).forEach(item => {
         const text = item.innerText.toLowerCase();
-        // Mantiene el diseño flex si coincide, si no lo oculta
-        item.style.display = text.includes(searchTerm) ? "flex" : "none";
+        // Usamos display flex para que no se rompa tu diseño original de las tarjetas
+        if (text.includes(filter)) {
+            item.style.display = "flex";
+        } else {
+            item.style.display = "none";
+        }
     });
 };
