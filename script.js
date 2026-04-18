@@ -279,10 +279,6 @@ window.refreshAdvanceDestinations = () => {
     container.innerHTML = html;
 };
 
-
-
-
-
         function generarEstructuraEliminacion(atletas) {
     // 1. Ordenamos por puntos de esgrima (de mayor a menor)
     const clasificados = [...atletas].sort((a, b) => b.puntosEsgrima - a.puntosEsgrima);
@@ -871,20 +867,20 @@ window.resetBrackets = () => {
 
         window.deletePlayer = async (id) => { if(confirm("¿Eliminar Atleta permanentemente?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'athletes', id)); };
 
-        function renderAdminAtletas() {
-            document.getElementById('adminAtletasList').innerHTML = players.map(p => `
-                <div class="flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-800">
-                    <div>
-                        <p class="text-[10px] font-black uppercase text-white">${p.name}</p>
-                        <p class="text-[8px] text-slate-500 uppercase">${p.category} | GRP ${p.group || 'A'} | ${p.event}</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="editPlayer('${p.id}')" class="text-blue-500 font-black text-[9px] uppercase">Editar</button>
-                        <button onclick="deletePlayer('${p.id}')" class="text-red-500 font-black text-[9px] uppercase">Eliminar</button>
-                    </div>
-                </div>
-            `).join('');
-        }
+       function renderAdminAtletas() {
+    document.getElementById('adminAtletasList').innerHTML = players.map(p => `
+        <div class="atleta-item flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-800">
+            <div>
+                <p class="text-[10px] font-black uppercase text-white">${p.name}</p>
+                <p class="text-[8px] text-slate-500 uppercase">${p.category} | GRP ${p.group || 'A'} | ${p.event}</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="editPlayer('${p.id}')" class="text-blue-500 font-black text-[9px] uppercase">Editar</button>
+                <button onclick="deletePlayer('${p.id}')" class="text-red-500 font-black text-[9px] uppercase">Eliminar</button>
+            </div>
+        </div>
+    `).join('');
+}
 
         // Función para llenar el selector de atletas en el panel de pruebas
 window.updateAtletaSelector = (atletas) => {
@@ -1314,20 +1310,14 @@ window.autoCalculateFinalTime = () => {
     }
 };
 
-// Función para filtrar atletas en tiempo real
+// Filtro de búsqueda en tiempo real
 window.filterAtletasList = () => {
     const searchTerm = document.getElementById('atletaSearchInput').value.toLowerCase();
-    const container = document.getElementById('adminAtletasList');
-    const items = container.getElementsByClassName('atleta-item'); // Asegúrate que tus items tengan esta clase
+    const items = document.getElementsByClassName('atleta-item');
 
     Array.from(items).forEach(item => {
-        // Busca el nombre dentro del componente (usualmente está en un span o strong)
-        const nombreAtleta = item.innerText.toLowerCase();
-        
-        if (nombreAtleta.includes(searchTerm)) {
-            item.style.display = "flex"; // O "block" según tu diseño
-        } else {
-            item.style.display = "none";
-        }
+        const text = item.innerText.toLowerCase();
+        // Usamos flex para mostrarlo porque es el estilo original de tu diseño
+        item.style.display = text.includes(searchTerm) ? "flex" : "none";
     });
 };
