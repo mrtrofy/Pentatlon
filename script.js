@@ -1313,3 +1313,21 @@ window.autoCalculateFinalTime = () => {
         campoFinal.value = "";
     }
 };
+
+// Función para filtrar atletas en tiempo real
+window.filterAtletasList = () => {
+    const searchTerm = document.getElementById('atletaSearchInput').value.toLowerCase();
+    const container = document.getElementById('adminAtletasList');
+    const items = container.getElementsByClassName('atleta-item'); // Asegúrate que tus items tengan esta clase
+
+    Array.from(items).forEach(item => {
+        // Busca el nombre dentro del componente (usualmente está en un span o strong)
+        const nombreAtleta = item.innerText.toLowerCase();
+        
+        if (nombreAtleta.includes(searchTerm)) {
+            item.style.display = "flex"; // O "block" según tu diseño
+        } else {
+            item.style.display = "none";
+        }
+    });
+};
