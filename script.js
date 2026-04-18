@@ -869,7 +869,7 @@ window.resetBrackets = () => {
 
        function renderAdminAtletas() {
     document.getElementById('adminAtletasList').innerHTML = players.map(p => `
-        <div class="atleta-item flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-800">
+        <div class="atleta-item flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-800 mb-2">
             <div>
                 <p class="text-[10px] font-black uppercase text-white">${p.name}</p>
                 <p class="text-[8px] text-slate-500 uppercase">${p.category} | GRP ${p.group || 'A'} | ${p.event}</p>
@@ -1316,7 +1316,7 @@ window.filterAtletasList = () => {
 
     Array.from(items).forEach(item => {
         const text = item.innerText.toLowerCase();
-        // Muestra si coincide, oculta si no
+        // Mantiene el diseño flex si coincide, si no lo oculta
         item.style.display = text.includes(searchTerm) ? "flex" : "none";
     });
 };
