@@ -80,6 +80,40 @@
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
+    <script type="module">
+        import { initializeApp } from "https://gstatic.com";
+        import { getAuth, createUserWithEmailAndPassword } from "https://gstatic.com";
+
+        // Tus credenciales de Firebase
+        const firebaseConfig = {
+  apiKey: "AIzaSyAtWCkDlZuv11AueTW6WEPNwAn97Vf-3yQ",
+  authDomain: "pentatlon-scores.firebaseapp.com",
+  projectId: "pentatlon-scores",
+  storageBucket: "pentatlon-scores.firebasestorage.app",
+  messagingSenderId: "650229123946",
+  appId: "1:650229123946:web:a3769c31f8ce1a23edb313"
+};
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Manejar el registro automático al enviar el formulario
+        const form = document.getElementById("register-form");
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    alert("¡Registro exitoso! Usuario: " + userCredential.user.email);
+                })
+                .catch((error) => {
+                    alert("Error: " + error.message);
+                });
+        });
+    </script>
 
     <div id="loadingOverlay">
         <div class="flex flex-col items-center gap-4">
