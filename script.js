@@ -1002,7 +1002,6 @@ function formatHandicapTime(seconds) {
 }
 
 // --- FUNCIÓN PRIVADA: GENERA EL ENCABEZADO ---
-// --- FUNCIÓN PRIVADA: GENERA EL ENCABEZADO ---
 async function _prepararPagina(doc, subtitulo) {
     const width = doc.internal.pageSize.getWidth();
     
@@ -1022,27 +1021,26 @@ async function _prepararPagina(doc, subtitulo) {
     await cargarLogo();
 
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
+    doc.setFontSize(14);
     doc.setTextColor(...PDF_CONFIG.colors.primary);
     
-    // Obtenemos el nombre del evento actual de forma segura para el título principal
+    // Aquí colocamos el nombre real del evento seleccionado como título principal
     const tituloEvento = (typeof window.currentEventTitle !== 'undefined' && window.currentEventTitle) 
         ? window.currentEventTitle.toUpperCase() 
         : "PENTA ELITE SYSTEM";
     doc.text(tituloEvento, 95, 38);
 
-    doc.setFontSize(10);
+    doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...PDF_CONFIG.colors.secondary);
     
-    // Mostramos tanto el subtítulo (ej: Clasificación General) como los filtros/evento asignado abajo
-    const infoFiltros = (typeof window.currentFiltersInfo !== 'undefined' && window.currentFiltersInfo) 
-        ? window.currentFiltersInfo 
-        : subtitulo.toUpperCase();
-    
+    // Subtítulo de la sección (ej. Clasificación General del Evento)
     doc.text(subtitulo.toUpperCase(), 95, 50);
-    doc.setFontSize(8);
-    doc.text(infoFiltros, 95, 62);
+
+    // Información detallada de filtros abajo (Categoría, Grupo, Género, etc.)
+    if (typeof window.currentFiltersInfo !== 'undefined' && window.currentFiltersInfo) {
+        doc.text(window.currentFiltersInfo, 95, 62);
+    }
 
     doc.setDrawColor(...PDF_CONFIG.colors.border);
     doc.line(40, 75, width - 40, 75);
