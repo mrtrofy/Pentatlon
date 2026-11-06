@@ -1021,23 +1021,28 @@ async function _prepararPagina(doc, subtitulo) {
     await cargarLogo();
 
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
+    doc.setFontSize(13);
     doc.setTextColor(...PDF_CONFIG.colors.primary);
     
-    // Aquí colocamos el nombre real del evento seleccionado como título principal
-    const tituloEvento = (typeof window.currentEventTitle !== 'undefined' && window.currentEventTitle) 
-        ? window.currentEventTitle.toUpperCase() 
-        : "PENTA ELITE SYSTEM";
-    doc.text(tituloEvento, 95, 38);
+    // Forzamos la lectura del título: primero de la variable global y si no, del título de la interfaz web
+    let nombreEventoFinal = "PENTA ELITE SYSTEM";
+    if (typeof window.currentEventTitle !== 'undefined' && window.currentEventTitle) {
+        nombreEventoFinal = window.currentEventTitle;
+    } else {
+        const viewTitleElem = document.getElementById('viewTitle');
+        if (viewTitleElem && viewTitleElem.innerText) {
+            nombreEventoFinal = viewTitleElem.innerText;
+        }
+    }
+
+    doc.text(nombreEventoFinal.toUpperCase(), 95, 38);
 
     doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(...PDF_CONFIG.colors.secondary);
     
-    // Subtítulo de la sección (ej. Clasificación General del Evento)
     doc.text(subtitulo.toUpperCase(), 95, 50);
 
-    // Información detallada de filtros abajo (Categoría, Grupo, Género, etc.)
     if (typeof window.currentFiltersInfo !== 'undefined' && window.currentFiltersInfo) {
         doc.text(window.currentFiltersInfo, 95, 62);
     }
