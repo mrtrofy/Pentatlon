@@ -1126,7 +1126,7 @@ async function _prepararPagina(doc, subtitulo) {
     const doc = new jsPDF('p', 'pt', 'a4');
     
     // 1. Extraemos directamente el nombre del evento desde el título de la vista web actual
-    let nombreEvento = "JUEGOS DEPORTIVOS NACIONALES JUVENILES 2026 CARACAS INSTITUTO NACIONAL DE DEPORTES";
+    let nombreEvento = "JUEGOS DEPORTIVOS NACIONALES JUVENILES 2026";
     const viewTitleElem = document.getElementById('viewTitle');
     if (typeof window.currentEventTitle !== 'undefined' && window.currentEventTitle) {
         nombreEvento = window.currentEventTitle;
