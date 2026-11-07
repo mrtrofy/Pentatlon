@@ -1,0 +1,6 @@
+ // 1. Extraemos directamente el nombre del evento desde el título de la vista web actual
+    let nombreEvento = "JUEGOS DEPORTIVOS NACIONALES JUVENILES 2026"; AQUI 
+    const viewTitleElem = document.getElementById('viewTitle');
+    if (typeof window.currentEventTitle !== 'undefined' && window.currentEventTitle) {
+        nombreEvento = window.currentEventTitle;
+    }
