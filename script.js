@@ -1495,3 +1495,36 @@ window.filterAtletasList = () => {
         }
     });
 };   
+
+    // --- FUNCIONES OFICIALES PARA RELEVOS ---
+function calcularPuntosObstaculosRelevo(tObs) {
+    if (tObs <= 0) return 0;
+    let pts = 400 - Math.floor((tObs - 35.00) / 0.33);
+    return Math.max(0, pts);
+}
+
+function calcularPuntosNatacionRelevo(tNat, categoria) {
+    if (tNat <= 0) return 0;
+    if (categoria === "U11" || categoria === "U09") {
+        let diff = tNat - 22.50;
+        let pts = 295 - Math.floor(diff / 0.20);
+        return Math.max(0, pts);
+    } else {
+        let diff = tNat - 45.00;
+        let pts = 375 - Math.floor(diff / 0.20);
+        return Math.max(0, pts);
+    }
+}
+
+function calcularPuntosLaserRelevo(tLas, categoria) {
+    if (tLas <= 0) return 0;
+    let baseSeconds = 430; // 07:10 en segundos
+    let basePts = 700;
+    if (categoria === "U19") {
+        baseSeconds = 260; 
+        basePts = 700;
+    }
+    let diffSecs = tLas - baseSeconds;
+    let pts = basePts - Math.floor(diffSecs);
+    return Math.max(0, pts);
+}
