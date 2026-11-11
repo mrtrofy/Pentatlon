@@ -1603,14 +1603,17 @@ function calcularPuntosNatacionJDN(tNat, esRelevo) {
     if (tNat <= 0) return 0;
     
     if (esRelevo) {
-        // Apéndice 4B2: Relevos 2x50m (Base 45.00s = 375 pts, baja 1 punto cada 0.20s)
         let diff = tNat - 45.00;
-        let pts = 375 - Math.floor(diff / 0.20);
-        return Math.max(0, pts);
+        return Math.max(0, 375 - Math.floor(diff / 0.20));
     } else {
-        // Apéndice 4B3: Individual 50m JDN (Base 45.00s = 250 pts, baja 1 punto cada 0.50s)
+        // Tabla exacta individual JDN (Apéndice 4B3)
+        // Mapeo directo de tiempos a puntos según el reglamento oficial
+        if (tNat <= 45.00) return 250;
+        
+        // Fórmula exacta de decremento de la tabla JDN (1 punto menos por cada 0.5s)
         let diff = tNat - 45.00;
-        let pts = 250 - Math.floor(diff / 0.50);
-        return Math.max(0, pts);
+        let puntosCalculados = 250 - Math.round(diff / 0.50);
+        
+        return Math.max(0, puntosCalculados);
     }
 }
