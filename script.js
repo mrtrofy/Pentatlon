@@ -588,7 +588,10 @@ window.updateBracketControls = () => {
             }
 
             // --- CÁLCULOS DE RELEVOS VS INDIVIDUAL ---
+           // --- CÁLCULOS DE RELEVOS VS INDIVIDUAL Y JDN ---
             const esRelevo = (sex === "TODOS");
+            const esJDN = (eventName && eventName.toUpperCase().includes("JDN")) || 
+                          (p.event && p.event.toUpperCase().includes("JDN"));
 
             let obsPts = 0, natPts = 0, lasPts = 0;
 
@@ -596,18 +599,23 @@ window.updateBracketControls = () => {
             const tNat = parseTime(p.natacion);
             const tLas = parseTime(p.laser);
 
-            if (esRelevo) {
-                // Aplicamos las tablas oficiales de Relevos
-                obsPts = calcularPuntosObstaculosRelevo(tObs);
+            // --- LÓGICA DE NATACIÓN (Con soporte especial para JDN) ---
+            if (esJDN) {
+                natPts = calcularPuntosNatacionJDN(tNat, esRelevo);
+            } else if (esRelevo) {
                 natPts = calcularPuntosNatacionRelevo(tNat, p.category);
-                lasPts = calcularPuntosLaserRelevo(tLas, p.category);
             } else {
-                // Tus cálculos individuales habituales
-                obsPts = tObs > 0 ? Math.max(0, 400 - Math.floor((tObs - 15) / 0.33)) : 0;
-
                 natPts = tNat > 0 
                     ? (p.category === "U19" ? Math.max(0, 250 - (tNat - 45) * 2) : Math.max(0, 375 - Math.ceil((tNat - 45) / 0.2)))
                     : 0;
+            }
+
+            // --- LÓGICA DE OBSTÁCULOS Y LÁSER ---
+            if (esRelevo) {
+                obsPts = calcularPuntosObstaculosRelevo(tObs);
+                lasPts = calcularPuntosLaserRelevo(tLas, p.category);
+            } else {
+                obsPts = tObs > 0 ? Math.max(0, 400 - Math.floor((tObs - 15) / 0.33)) : 0;
 
                 if (tLas > 0) {
                     lasPts = (p.category === "U19") 
@@ -621,7 +629,6 @@ window.updateBracketControls = () => {
 
             return { ...p, esgrimaPts, obsPts, natPts, lasPts, hPts, total };
         }).sort((a, b) => b.total - a.total);
-
 
         // --- RENDERIZADO DE TABLA PRINCIPAL ---
         const scoreboardBody = document.getElementById('scoreboardBody');
@@ -1591,3 +1598,19 @@ window.downloadDisciplinasPDF = async () => {
     
     doc.save("Reporte_Disciplina.pdf");
 };
+// --- CÁLCULO OFICIAL DE NATACIÓN JDN 2026 ---
+function calcularPuntosNatacionJDN(tNat, esRelevo) {
+    if (tNat <= 0) return 0;
+    
+    if (esRelevo) {
+        // Apéndice 4B2: Relevos 2x50m (Base 45.00s = 375 pts, baja 1 punto cada 0.20s)
+        let diff = tNat - 45.00;
+        let pts = 375 - Math.floor(diff / 0.20);
+        return Math.max(0, pts);
+    } else {
+        // Apéndice 4B3: Individual 50m JDN (Base 45.00s = 250 pts, baja 1 punto cada 0.50s)
+        let diff = tNat - 45.00;
+        let pts = 250 - Math.floor(diff / 0.50);
+        return Math.max(0, pts);
+    }
+}
