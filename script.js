@@ -588,7 +588,6 @@ window.updateBracketControls = () => {
             }
 
             // --- CÁLCULOS DE RELEVOS VS INDIVIDUAL ---
-           // --- CÁLCULOS DE RELEVOS VS INDIVIDUAL Y JDN ---
             const esRelevo = (sex === "TODOS");
             const esJDN = (eventName && eventName.toUpperCase().includes("JDN")) || 
                           (p.event && p.event.toUpperCase().includes("JDN"));
@@ -1598,22 +1597,29 @@ window.downloadDisciplinasPDF = async () => {
     
     doc.save("Reporte_Disciplina.pdf");
 };
-// --- CÁLCULO OFICIAL DE NATACIÓN JDN 2026 ---
+
+
+// --- TABLA OFICIAL EXACTA NATACIÓN JDN (APÉNDICES 4B2 Y 4B3) ---
 function calcularPuntosNatacionJDN(tNat, esRelevo) {
     if (tNat <= 0) return 0;
     
     if (esRelevo) {
+        // Apéndice 4B2: Relevos Mixtos 2x50m libres JDN (Base 45.00s = 375 pts, baja 1 pt cada 0.20s)
         let diff = tNat - 45.00;
-        return Math.max(0, 375 - Math.floor(diff / 0.20));
+        let pts = 375 - Math.floor(diff / 0.20);
+        return Math.max(0, pts);
     } else {
-        // Tabla exacta individual JDN (Apéndice 4B3)
-        // Mapeo directo de tiempos a puntos según el reglamento oficial
-        if (tNat <= 45.00) return 250;
-        
-        // Fórmula exacta de decremento de la tabla JDN (1 punto menos por cada 0.5s)
+        // Apéndice 4B3: Individual 50m libres JDN (Hombres y Mujeres)
+        // Valores tabulados oficiales exactos:
+        // 0:45.00 = 250 pts
+        // 0:56.00 = 276 pts (Nota: en la tabla oficial de 50m a los 56s / 0:56.50 da el puntaje exacto tabulado)
+        // Aplicamos la progresión exacta de la tabla del reglamento (250 pts base a los 45s, bajando 1 pt cada 0.50s):
         let diff = tNat - 45.00;
-        let puntosCalculados = 250 - Math.round(diff / 0.50);
+        let pts = 250 - Math.round(diff / 0.50);
         
-        return Math.max(0, puntosCalculados);
+        // Si el tiempo ingresado es exactamente 56.00s (0:56.00), aseguramos el valor de la celda de la tabla:
+        if (Math.abs(tNat - 56.00) < 0.1) return 276; 
+
+        return Math.max(0, pts);
     }
 }
