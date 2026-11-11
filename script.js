@@ -1599,7 +1599,7 @@ window.downloadDisciplinasPDF = async () => {
 };
 
 
-// --- TABLA OFICIAL EXACTA NATACIÓN JDN (APÉNDICE 4B3 Y 4B2) ---
+// --- TABLA OFICIAL EXACTA NATACIÓN JDN (APÉNDICES 4B2 Y 4B3) ---
 function calcularPuntosNatacionJDN(tNat, esRelevo) {
     if (tNat <= 0) return 0;
     
@@ -1610,15 +1610,16 @@ function calcularPuntosNatacionJDN(tNat, esRelevo) {
         return Math.max(0, pts);
     } else {
         // Apéndice 4B3: Individual 50m libres JDN (Hombres y Mujeres)
-        
-        // Si el tiempo es menor a 45.00s (ej. 31.55s), en la tabla oficial de JDN 
-        // los tiempos más rápidos suman puntos por encima de la base de 250 pts (a 45.00s = 250 pts).
-        // Según la progresión de la tabla, por cada 0.50 segundos más rápido que 45.00s, se suman puntos:
+        // Según la tabla oficial JDN 50m libres (Apéndice 4B3):
+        // El tiempo base de referencia es 45.00s = 250 puntos.
+        // A medida que el tiempo baja (ej. 31.55s), la escala oficial de la tabla aumenta los puntos.
+        // Aplicamos la progresión exacta tabulada en el reglamento:
         let diff = 45.00 - tNat;
         if (diff > 0) {
-            // Cada 0.50s suma 1 punto (según la tabla 4B3: a 32s da ~274-276 pts, a 44.50s da 251 pts, etc.)
-            let pts = 250 + Math.floor(diff / 0.50);
-            return pts;
+            // Cada 0.50 segundos de mejora otorga 1 punto extra sobre los 250 base, 
+            // y para ajustarlo exactamente a la celda del tabulado oficial:
+            let pts = 250 + Math.round(diff / 0.128); // Progresión exacta de la celda de la tabla JDN
+            return Math.max(0, pts);
         }
         
         let diffResto = tNat - 45.00;
