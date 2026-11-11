@@ -578,38 +578,49 @@ window.updateBracketControls = () => {
         // 3. Procesar cálculos usando el ranking fijo
         const data = sortedByFencing.map((p, index) => {
             
-            // --- NUEVA LÓGICA ESGRIMA (Tabla Fija de Imagen) ---
+            // --- NUEVA LÓGICA ESGRIMA (Se mantiene igual) ---
             const posicion = index + 1; // index 0 es posición 1
             const wins = parseInt(p.esgrimaV) || 0;
             
             let esgrimaPts = 0;
             if (wins > 0) {
-         
                 esgrimaPts = UipmPoints[posicion] || Math.max(0, 152 - ((posicion - 40) * 2));
             }
 
-            // --- EL RESTO DE TUS CÁLCULOS (Se mantienen igual) ---
+            // --- CÁLCULOS DE RELEVOS VS INDIVIDUAL ---
+            const esRelevo = (sex === "TODOS");
+
+            let obsPts = 0, natPts = 0, lasPts = 0;
+
             const tObs = parseTime(p.obstaculos);
-            const obsPts = tObs > 0 ? Math.max(0, 400 - Math.floor((tObs - 15) / 0.33)) : 0;
-
             const tNat = parseTime(p.natacion);
-            const natPts = tNat > 0 
-                ? (p.category === "U19" ? Math.max(0, 250 - (tNat - 45) * 2) : Math.max(0, 375 - Math.ceil((tNat - 45) / 0.2)))
-                : 0;
-
             const tLas = parseTime(p.laser);
-            let lasPts = 0;
-            if (tLas > 0) {
-                lasPts = (p.category === "U19") 
-                    ? Math.max(0, 700 - (tLas - 260)) 
-                    : Math.max(0, 700 - Math.floor(tLas - 600));
+
+            if (esRelevo) {
+                // Aplicamos las tablas oficiales de Relevos
+                obsPts = calcularPuntosObstaculosRelevo(tObs);
+                natPts = calcularPuntosNatacionRelevo(tNat, p.category);
+                lasPts = calcularPuntosLaserRelevo(tLas, p.category);
+            } else {
+                // Tus cálculos individuales habituales
+                obsPts = tObs > 0 ? Math.max(0, 400 - Math.floor((tObs - 15) / 0.33)) : 0;
+
+                natPts = tNat > 0 
+                    ? (p.category === "U19" ? Math.max(0, 250 - (tNat - 45) * 2) : Math.max(0, 375 - Math.ceil((tNat - 45) / 0.2)))
+                    : 0;
+
+                if (tLas > 0) {
+                    lasPts = (p.category === "U19") 
+                        ? Math.max(0, 700 - (tLas - 260)) 
+                        : Math.max(0, 700 - Math.floor(tLas - 600));
+                }
             }
 
             const hPts = esgrimaPts + obsPts + natPts;
             const total = Math.round(hPts + lasPts);
 
             return { ...p, esgrimaPts, obsPts, natPts, lasPts, hPts, total };
-        }).sort((a, b) => b.total - a.total); // Finalmente ordenamos la tabla general por TOTAL
+        }).sort((a, b) => b.total - a.total);
 
 
         // --- RENDERIZADO DE TABLA PRINCIPAL ---
