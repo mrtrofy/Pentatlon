@@ -1347,9 +1347,12 @@ window.ejecutarDescargaSegunVista = () => {
     const isRanking = !document.getElementById('rankingSubView').classList.contains('hidden');
     const isEsgrima = !document.getElementById('statusSubView').classList.contains('hidden');
     const isHandicap = !document.getElementById('handicapSubView').classList.contains('hidden');
+    const isDisciplinas = !document.getElementById('disciplinasSubView').classList.contains('hidden'); // <--- NUEVA VALIDACIÓN
 
-    if (isEsgrima) {
-        // Ejecutamos la función de las LLAVES que te gusta
+    if (isDisciplinas) {
+        window.downloadDisciplinasPDF(); // <--- LLAMA A LA NUEVA DESCARGA
+    }
+    else if (isEsgrima) {
         window.downloadBracketPDF(); 
     } 
     else if (isHandicap) {
@@ -1539,3 +1542,52 @@ function calcularPuntosLaserRelevo(tLas, categoria) {
     let pts = basePts - Math.floor(diffSecs);
     return Math.max(0, pts);
 }
+
+// --- DESCARGA: DISCIPLINAS / PRUEBAS INDIVIDUALES ---
+window.downloadDisciplinasPDF = async () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'pt', 'a4');
+    
+    // Obtenemos el título de la prueba actual desde la interfaz
+    let tituloPrueba = "REGISTRO DE DISCIPLINA";
+    const viewTitleElem = document.getElementById('viewTitle');
+    if (viewTitleElem && viewTitleElem.innerText) {
+        tituloPrueba = viewTitleElem.innerText;
+    }
+
+    await _prepararPagina(doc, tituloPrueba);
+
+    // Recorremos la tabla visible de disciplinas
+    const filas = [];
+    document.querySelectorAll("#disciplinasBody tr").forEach(tr => {
+        const c = tr.querySelectorAll("td");
+        if(c.length >= 3) {
+            filas.push([
+                c[0].innerText.trim().toUpperCase(), // Nombre
+                c[1].innerText.trim().toUpperCase(), // Estado
+                c[2] ? c[2].innerText.trim() : '--', // Tiempo Inicial
+                c[3] ? c[3].innerText.trim().replace(/\n/g, ' ') : '0 Pts', // Penalidad
+                c[4] ? c[4].innerText.trim().replace(/\n/g, ' ') : '--'  // Tiempo Final
+            ]);
+        }
+    });
+
+    if (filas.length === 0) {
+        alert("⚠️ No hay registros en esta disciplina para descargar.");
+        return;
+    }
+
+    doc.autoTable({
+        startY: 90,
+        head: [['NOMBRE', 'ESTADO', 'TIEMPO INICIAL', 'PENALIDAD', 'TIEMPO FINAL']],
+        body: filas,
+        theme: 'striped',
+        headStyles: { fillColor: PDF_CONFIG.colors.primary, halign: 'center' },
+        styles: { fontSize: 8, halign: 'center', cellPadding: 6 },
+        columnStyles: { 
+            0: { halign: 'left', fontStyle: 'bold' } 
+        }
+    });
+    
+    doc.save("Reporte_Disciplina.pdf");
+};
