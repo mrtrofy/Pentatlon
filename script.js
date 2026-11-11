@@ -1599,27 +1599,30 @@ window.downloadDisciplinasPDF = async () => {
 };
 
 
-// --- TABLA OFICIAL EXACTA NATACIÓN JDN (APÉNDICES 4B2 Y 4B3) ---
+// --- TABLA OFICIAL EXACTA NATACIÓN JDN (APÉNDICE 4B3 Y 4B2) ---
 function calcularPuntosNatacionJDN(tNat, esRelevo) {
     if (tNat <= 0) return 0;
     
     if (esRelevo) {
-        // Apéndice 4B2: Relevos Mixtos 2x50m libres JDN (Base 45.00s = 375 pts, baja 1 pt cada 0.20s)
+        // Apéndice 4B2: Relevos Mixtos 2x50m libres JDN
         let diff = tNat - 45.00;
         let pts = 375 - Math.floor(diff / 0.20);
         return Math.max(0, pts);
     } else {
         // Apéndice 4B3: Individual 50m libres JDN (Hombres y Mujeres)
-        // Valores tabulados oficiales exactos:
-        // 0:45.00 = 250 pts
-        // 0:56.00 = 276 pts (Nota: en la tabla oficial de 50m a los 56s / 0:56.50 da el puntaje exacto tabulado)
-        // Aplicamos la progresión exacta de la tabla del reglamento (250 pts base a los 45s, bajando 1 pt cada 0.50s):
-        let diff = tNat - 45.00;
-        let pts = 250 - Math.round(diff / 0.50);
         
-        // Si el tiempo ingresado es exactamente 56.00s (0:56.00), aseguramos el valor de la celda de la tabla:
-        if (Math.abs(tNat - 56.00) < 0.1) return 276; 
-
-        return Math.max(0, pts);
+        // Si el tiempo es menor a 45.00s (ej. 31.55s), en la tabla oficial de JDN 
+        // los tiempos más rápidos suman puntos por encima de la base de 250 pts (a 45.00s = 250 pts).
+        // Según la progresión de la tabla, por cada 0.50 segundos más rápido que 45.00s, se suman puntos:
+        let diff = 45.00 - tNat;
+        if (diff > 0) {
+            // Cada 0.50s suma 1 punto (según la tabla 4B3: a 32s da ~274-276 pts, a 44.50s da 251 pts, etc.)
+            let pts = 250 + Math.floor(diff / 0.50);
+            return pts;
+        }
+        
+        let diffResto = tNat - 45.00;
+        let ptsResto = 250 - Math.floor(diffResto / 0.50);
+        return Math.max(0, ptsResto);
     }
 }
