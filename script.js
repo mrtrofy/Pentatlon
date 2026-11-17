@@ -1600,17 +1600,39 @@ window.downloadDisciplinasPDF = async () => {
 };
 
 
+// --- TABLA OFICIAL EXACTA NATACIÓN JDN (APÉNDICE 4B3 Y 4B2) ---
+function calcularPuntosNatacionJDN(tNat, esRelevo) {
+    if (tNat <= 0) return 0;
+    
+    if (esRelevo) {
+        // Apéndice 4B2: Relevos Mixtos 2x50m libres JDN
+        let diff = tNat - 45.00;
+        let pts = 375 - Math.floor(diff / 0.20);
+        return Math.max(0, pts);
+    } else {
+        // Apéndice 4B3: Individual 50m libres JDN (Hombres y Mujeres)
+        let diff = 45.00 - tNat;
+        if (diff > 0) {
+            let pts = 250 + Math.floor(diff / 0.50) + 1;
+            return pts;
+        } else if (diff === 0) {
+            return 250;
+        } else {
+            let diffResto = tNat - 45.00;
+            let ptsResto = 250 - Math.floor(diffResto / 0.50);
+            return Math.max(0, ptsResto);
+        }
+    }
+}
+
 // --- TABLA OFICIAL EXACTA LÁSER-RUN JDN (APÉNDICE 5B2) ---
 function calcularPuntosLaserJDN(tLas, categoria, esRelevo) {
     if (tLas <= 0) return 0;
     
-    // Según la tabla oficial del Apéndice 5B2 (para JDN / Relevos / Senior):
-    // 07:10 (430 segundos) = 700 puntos exactos.
-    // Por cada 1 segundo de retraso (mayor tiempo), se resta 1 punto de forma exacta.
-    let baseSeconds = 430; // 07:10 min en segundos
-    let basePts = 700;    // 700 puntos base[cite: 5]
+    // Según la tabla oficial del Apéndice 5B2 (07:10 = 430s = 700 pts, restando 1 pt por cada segundo)[cite: 5]
+    let baseSeconds = 430; 
+    let basePts = 700;
     
-    // Si la categoría es U19 individual y requiere otra base, se maneja de forma independiente:
     if (categoria === "U19" && !esRelevo) {
         baseSeconds = 260; 
         basePts = 700;
