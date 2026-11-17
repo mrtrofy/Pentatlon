@@ -559,9 +559,9 @@ window.updateBracketControls = () => {
         }
 
 
-  function renderResults(eventName, sex, phase, category, discipline, group) {
+ function renderResults(eventName, sex, phase, category, discipline, group) {
     try {
-// 1. Filtrado de atletas (se mantiene igual)
+        // 1. Filtrado de atletas
         const filteredPlayers = players.filter(p => 
             p.event === eventName && p.sex === sex && p.phase === phase && 
             p.category === category && p.group === group
@@ -569,8 +569,7 @@ window.updateBracketControls = () => {
 
         console.log("Atletas para renderizar:", filteredPlayers.length);
 
-        // 2. NUEVA LÓGICA: Sorteo previo por victorias de esgrima (para ranking)
-        // Esto pone al que más ganó en la posición 1
+        // 2. Sorteo previo por victorias de esgrima (para ranking)
         const sortedByFencing = [...filteredPlayers].sort((a, b) => {
             return (parseInt(b.esgrimaV) || 0) - (parseInt(a.esgrimaV) || 0);
         });
@@ -578,7 +577,7 @@ window.updateBracketControls = () => {
         // 3. Procesar cálculos usando el ranking fijo
         const data = sortedByFencing.map((p, index) => {
             
-            // --- NUEVA LÓGICA ESGRIMA (Se mantiene igual) ---
+            // --- LÓGICA ESGRIMA ---
             const posicion = index + 1; // index 0 es posición 1
             const wins = parseInt(p.esgrimaV) || 0;
             
@@ -587,8 +586,8 @@ window.updateBracketControls = () => {
                 esgrimaPts = UipmPoints[posicion] || Math.max(0, 152 - ((posicion - 40) * 2));
             }
 
-            // --- CÁLCULOS DE RELEVOS VS INDIVIDUAL ---
-           const esRelevo = (sex === "TODOS");
+            // --- CÁLCULOS DE RELEVOS VS INDIVIDUAL Y JDN ---
+            const esRelevo = (sex === "TODOS");
             const esJDN = (eventName && eventName.toUpperCase().includes("JDN")) || 
                           (p.event && p.event.toUpperCase().includes("JDN")) ||
                           (p.category && p.category.toUpperCase().includes("JDN"));
@@ -599,7 +598,7 @@ window.updateBracketControls = () => {
             const tNat = parseTime(p.natacion);
             const tLas = parseTime(p.laser);
 
-            // --- LÓGICA DE NATACIÓN (Con soporte especial para JDN) ---
+            // --- LÓGICA DE NATACIÓN (Con soporte JDN Apéndice 4B3 / 4B2) ---
             if (esJDN) {
                 natPts = calcularPuntosNatacionJDN(tNat, esRelevo);
             } else if (esRelevo) {
@@ -610,17 +609,23 @@ window.updateBracketControls = () => {
                     : 0;
             }
 
-            // --- LÓGICA DE OBSTÁCULOS Y LÁSER ---
+            // --- LÓGICA DE OBSTÁCULOS Y LÁSER (Con soporte JDN Apéndice 5B2 / 5B3) ---
             if (esRelevo) {
                 obsPts = calcularPuntosObstaculosRelevo(tObs);
-                lasPts = calcularPuntosLaserRelevo(tLas, p.category);
+                lasPts = esJDN 
+                    ? calcularPuntosLaserJDN(tLas, p.category, true) 
+                    : calcularPuntosLaserRelevo(tLas, p.category);
             } else {
                 obsPts = tObs > 0 ? Math.max(0, 400 - Math.floor((tObs - 15) / 0.33)) : 0;
 
                 if (tLas > 0) {
-                    lasPts = (p.category === "U19") 
-                        ? Math.max(0, 700 - (tLas - 260)) 
-                        : Math.max(0, 700 - Math.floor(tLas - 600));
+                    if (esJDN) {
+                        lasPts = calcularPuntosLaserJDN(tLas, p.category, false);
+                    } else {
+                        lasPts = (p.category === "U19") 
+                            ? Math.max(0, 700 - (tLas - 260)) 
+                            : Math.max(0, 700 - Math.floor(tLas - 600));
+                    }
                 }
             }
 
